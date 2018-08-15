@@ -25,7 +25,7 @@ namespace IISSample
             });
         }
 
-        public void Configure(IApplicationBuilder app, ILoggerFactory loggerfactory, IAuthenticationSchemeProvider authSchemeProvider)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerfactory) //, IAuthenticationSchemeProvider authSchemeProvider)
         {
             var logger = loggerfactory.CreateLogger("Requests");
 
@@ -54,9 +54,15 @@ namespace IISSample
                 await context.Response.WriteAsync(Environment.NewLine);
 
                 await context.Response.WriteAsync("User: " + context.User.Identity.Name + Environment.NewLine);
-                var scheme = await authSchemeProvider.GetSchemeAsync(IISDefaults.AuthenticationScheme);
-                await context.Response.WriteAsync("DisplayName: " + scheme?.DisplayName + Environment.NewLine);
-                await context.Response.WriteAsync(Environment.NewLine);
+
+                /*
+                try
+                {
+                    var scheme = await authSchemeProvider.GetSchemeAsync(IISDefaults.AuthenticationScheme);
+                    await context.Response.WriteAsync("DisplayName: " + scheme?.DisplayName + Environment.NewLine);
+                    await context.Response.WriteAsync(Environment.NewLine);
+                } catch (Exception ex) { await context.Response.WriteAsync($"no IISDefaults.AuthenticationScheme: {ex}\n"); }
+                */
 
                 await context.Response.WriteAsync("Headers:" + Environment.NewLine);
                 foreach (var header in context.Request.Headers)
@@ -96,6 +102,8 @@ namespace IISSample
                 .UseKestrel()
                 .UseStartup<Startup>()
                 .Build();
+
+            // No service for type 'Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider' has been registered.
 
             host.Run();
         }
