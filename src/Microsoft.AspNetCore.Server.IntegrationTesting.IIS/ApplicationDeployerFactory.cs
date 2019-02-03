@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting
                 case ServerType.IIS:
                     return new IISDeployer(deploymentParameters, loggerFactory);
                 default:
-                    return ApplicationDeployerFactory.Create(deploymentParameters, loggerFactory);
+                    return ApplicationDeployerFactory.Create(deploymentParameters, loggerFactory) as ApplicationDeployer;
             }
         }
     }

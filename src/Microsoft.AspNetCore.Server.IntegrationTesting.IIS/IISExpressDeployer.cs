@@ -74,7 +74,9 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
 
                     if (DeploymentParameters.RuntimeFlavor == RuntimeFlavor.CoreClr && DeploymentParameters.ApplicationType == ApplicationType.Portable)
                     {
-                        executableName = GetDotNetExeForArchitecture();
+                        // ankr: TODO:
+                        executableName = DotNetCommands.GetDotNetExecutable(RuntimeArchitecture.x64);
+                        // GetDotNetExeForArchitecture();
                         executableArgs = entryPoint;
                     }
                     else
@@ -93,7 +95,8 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
 
                 RunWebConfigActions(contentRoot);
 
-                var testUri = TestUriHelper.BuildTestUri(ServerType.IISExpress, DeploymentParameters.ApplicationBaseUriHint);
+                // ankr TODO:
+                var testUri = TestUriHelper.BuildTestUri(); // (ServerType.IISExpress, DeploymentParameters.ApplicationBaseUriHint);
 
                 // Launch the host process.
                 var (actualUri, hostExitToken) = await StartIISExpressAsync(testUri, contentRoot);
@@ -155,7 +158,7 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
                 var port = uri.Port;
                 if (port == 0)
                 {
-                    port = (uri.Scheme == "https") ? TestPortHelper.GetNextSSLPort() : TestPortHelper.GetNextPort();
+                    port = TestUriHelper.GetNextPort(); // TODO: (uri.Scheme == "https") ? TestPortHelper.GetNextSSLPort() : TestPortHelper.GetNextPort();
                 }
 
                 Logger.LogInformation("Attempting to start IIS Express on port: {port}", port);
@@ -289,7 +292,7 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
                 .RequiredElement("location")
                 .RequiredElement("system.webServer")
                 .RequiredElement("modules")
-                .GetOrAdd("add", "name", DeploymentParameters.AncmVersion.ToString());
+                .GetOrAdd("add", "name", AncmVersion.AspNetCoreModuleV2.ToString()); // DeploymentParameters.AncmVersion.ToString());
 
             ConfigureModuleAndBinding(config.Root, contentRoot, port);
 
@@ -329,7 +332,7 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
 
             aspNetCoreHandler.SetAttributeValue("path", "*");
             aspNetCoreHandler.SetAttributeValue("verb", "*");
-            aspNetCoreHandler.SetAttributeValue("modules", DeploymentParameters.AncmVersion.ToString());
+            aspNetCoreHandler.SetAttributeValue("modules", AncmVersion.AspNetCoreModuleV2.ToString()); // DeploymentParameters.AncmVersion.ToString());
             aspNetCoreHandler.SetAttributeValue("resourceType", "Unspecified");
             // Make aspNetCore handler first
             aspNetCoreHandler.Remove();
@@ -347,13 +350,13 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
 
                 yield return WebConfigHelpers.AddOrModifyHandlerSection(
                     key: "modules",
-                    value: DeploymentParameters.AncmVersion.ToString());
+                    value: AncmVersion.AspNetCoreModuleV2.ToString()); // DeploymentParameters.AncmVersion.ToString());
 
                 // We assume the x64 dotnet.exe is on the path so we need to provide an absolute path for x86 scenarios.
                 // Only do it for scenarios that rely on dotnet.exe (Core, portable, etc.).
                 if (DeploymentParameters.RuntimeFlavor == RuntimeFlavor.CoreClr
                     && DeploymentParameters.ApplicationType == ApplicationType.Portable
-                    && DotNetCommands.IsRunningX86OnX64(DeploymentParameters.RuntimeArchitecture))
+                    )  // && DotNetCommands.IsRunningX86OnX64(DeploymentParameters.RuntimeArchitecture))
                 {
                     var executableName = DotNetCommands.GetDotNetExecutable(DeploymentParameters.RuntimeArchitecture);
                     if (!File.Exists(executableName))

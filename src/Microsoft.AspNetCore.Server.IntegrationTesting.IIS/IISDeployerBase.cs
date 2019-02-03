@@ -8,7 +8,52 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Server.IntegrationTesting;
 using Microsoft.Extensions.Logging;
+
+namespace Microsoft.AspNetCore.Server
+{
+    // workarounds for MicrosoftAspNetCoreServerIntegrationTestingPackageVersion 0.6.0
+
+    public class DeploymentParameters051
+    {
+        public static AncmVersion AncmVersion { get => AncmVersion.AspNetCoreModuleV2; }
+    }
+
+    public class AncmVersion
+    {
+        public AncmVersion()
+        {
+            AspNetCoreModuleV1 = new AncmVersion { Version = "V1" };
+            AspNetCoreModuleV2 = new AncmVersion { Version = "V2" };
+        }
+
+        public static AncmVersion AspNetCoreModuleV1 { get; private set; }
+        public static AncmVersion AspNetCoreModuleV2 { get; private set; }
+
+        public string Version { get; set; }
+    }
+
+    public class TestVariant
+    {
+        public string applicationPath { get; set; }
+        public ServerType serverType { get; set; }
+        public RuntimeFlavor runtimeFlavor { get; set; }
+        public RuntimeArchitecture runtimeArchitecture { get; set; }
+    }
+
+    public class DotNetCommands
+    {
+        public static bool IsRunningX86OnX64(RuntimeArchitecture architecture)
+            => architecture == RuntimeArchitecture.x64;  // ???
+
+        public static string GetDotNetExecutable(RuntimeArchitecture architecture)
+            => architecture == RuntimeArchitecture.x64 ?
+               @"c:\Program Files\dotnet\dotnet.exe" :
+               @"c:\Program Files (x86)\dotnet\dotnet.exe"; 
+
+    }
+}
 
 namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
 {
@@ -144,12 +189,12 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
                 .RequiredElement("binding")
                 .SetAttributeValue("bindingInformation", $":{port}:localhost");
 
-            var ancmVersion = DeploymentParameters.AncmVersion.ToString();
+            var ancmVersion = AncmVersion.AspNetCoreModuleV2; // .ToString();
             config
                 .RequiredElement("system.webServer")
                 .RequiredElement("globalModules")
-                .GetOrAdd("add", "name", ancmVersion)
-                .SetAttributeValue("image", GetAncmLocation(DeploymentParameters.AncmVersion));
+                .GetOrAdd("add", "name", ancmVersion.ToString())
+                .SetAttributeValue("image", GetAncmLocation(ancmVersion)); // DeploymentParameters.AncmVersion));
         }
 
         public abstract void Dispose(bool gracefulShutdown);

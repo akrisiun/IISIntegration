@@ -22,6 +22,7 @@ namespace Microsoft.AspNetCore.Server.IISIntegration.FunctionalTests
             _fixture = fixture;
         }
 
+        /*
         public static TestMatrix TestVariants
             => TestMatrix.ForServers(DeployerSelector.ServerType)
                 .WithTfms(Tfm.NetCoreApp22, Tfm.Net461)
@@ -48,5 +49,6 @@ namespace Microsoft.AspNetCore.Server.IISIntegration.FunctionalTests
             Assert.StartsWith("Windows:", responseText);
             Assert.Contains(Environment.UserName, responseText);
         }
+        */
     }
 }

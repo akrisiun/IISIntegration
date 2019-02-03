@@ -9,26 +9,46 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
 {
     public class IISDeploymentParameters : DeploymentParameters
     {
-        public IISDeploymentParameters() : base()
-        {
+        public class Params {
+            static Params() {
+                Default = new Params { applicationPath = "", serverType = ServerType.IIS,
+                    runtimeArchitecture = RuntimeArchitecture.x64, runtimeFlavor = RuntimeFlavor.CoreClr };
+            }
+            public static Params Default { get; set; }
+
+            public string applicationPath { get; set; }
+            public  ServerType serverType { get; set; }
+            public RuntimeFlavor runtimeFlavor { get; set; }
+            public RuntimeArchitecture runtimeArchitecture { get; set; }
+
+            public static Params TestVariant(TestVariant variant)
+                => new Params {
+                    applicationPath = variant.applicationPath,
+                    serverType = variant.serverType,
+                    runtimeArchitecture = variant.runtimeArchitecture,
+                    runtimeFlavor = variant.runtimeFlavor
+                };
+
+            public static Params DeploymentParameters(DeploymentParameters parameters)
+                 => new Params {
+                     applicationPath = parameters.ApplicationPath,
+                     serverType = parameters.ServerType,
+                     runtimeArchitecture = parameters.RuntimeArchitecture,
+                     runtimeFlavor = parameters.RuntimeFlavor 
+                };
         }
 
-        public IISDeploymentParameters(TestVariant variant)
-            : base(variant)
-        {
-        }
+        public IISDeploymentParameters() : this(Params.Default)
+        { }
 
-        public IISDeploymentParameters(
-           string applicationPath,
-           ServerType serverType,
-           RuntimeFlavor runtimeFlavor,
-           RuntimeArchitecture runtimeArchitecture)
-            : base(applicationPath, serverType, runtimeFlavor, runtimeArchitecture)
-        {
-        }
+        public IISDeploymentParameters(TestVariant variant) : this(Params.TestVariant(variant))
+        { }
+
+        public IISDeploymentParameters(Params param) : this(param.applicationPath, param.serverType, param.runtimeFlavor, param.runtimeArchitecture)
+        { }
 
         public IISDeploymentParameters(DeploymentParameters parameters)
-            : base(parameters)
+            : this(Params.DeploymentParameters(parameters))
         {
             if (parameters is IISDeploymentParameters)
             {
@@ -38,6 +58,15 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
                 WebConfigBasedEnvironmentVariables = tempParameters.WebConfigBasedEnvironmentVariables;
                 HandlerSettings = tempParameters.HandlerSettings;
             }
+        }
+
+        public IISDeploymentParameters(
+               string applicationPath,
+               ServerType serverType,
+               RuntimeFlavor runtimeFlavor,
+               RuntimeArchitecture runtimeArchitecture)
+             : base(applicationPath, serverType, runtimeFlavor, runtimeArchitecture)
+        {
         }
 
         public IList<Action<XElement, string>> WebConfigActionList { get; } = new List<Action<XElement, string>>();

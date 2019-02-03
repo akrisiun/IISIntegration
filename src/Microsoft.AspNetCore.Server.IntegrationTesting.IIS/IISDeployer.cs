@@ -97,7 +97,8 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
 
                 RunWebConfigActions(contentRoot);
 
-                var uri = TestUriHelper.BuildTestUri(ServerType.IIS, DeploymentParameters.ApplicationBaseUriHint);
+                // ankr TODO:
+                var uri = TestUriHelper.BuildTestUri(); // (ServerType.IIS, DeploymentParameters.ApplicationBaseUriHint);
                 StartIIS(uri, contentRoot);
 
                 // Warm up time for IIS setup.
@@ -134,7 +135,7 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
 
             yield return WebConfigHelpers.AddOrModifyHandlerSection(
                 key: "modules",
-                value: DeploymentParameters.AncmVersion.ToString());
+                value: DeploymentParameters051.AncmVersion.ToString());
 
             foreach (var action in base.GetWebConfigActions())
             {
@@ -187,10 +188,10 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
                     }
                 }
                 // ANCM V1 does not support logs
-                if (DeploymentParameters.AncmVersion == AncmVersion.AspNetCoreModuleV2)
-                {
-                    throw new InvalidOperationException($"Unable to find non-empty debug log files. Tried: {string.Join(", ", debugLogLocations)}");
-                }
+                //if (DeploymentParameters051.AncmVersion == AncmVersion.AspNetCoreModuleV2)
+                //{
+                //    throw new InvalidOperationException($"Unable to find non-empty debug log files. Tried: {string.Join(", ", debugLogLocations)}");
+                //}
             }
             finally
             {
@@ -304,7 +305,7 @@ namespace Microsoft.AspNetCore.Server.IntegrationTesting.IIS
             config
                 .RequiredElement("system.webServer")
                 .RequiredElement("modules")
-                .GetOrAdd("add", "name", DeploymentParameters.AncmVersion.ToString());
+                .GetOrAdd("add", "name", AncmVersion.AspNetCoreModuleV2.ToString()); // DeploymentParameters.AncmVersion.ToString());
 
             var pool = config
                 .RequiredElement("system.applicationHost")
