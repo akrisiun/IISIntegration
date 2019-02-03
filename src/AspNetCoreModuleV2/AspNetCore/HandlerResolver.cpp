@@ -17,6 +17,9 @@
 #include "ModuleHelpers.h"
 #include "BaseOutputManager.h"
 #include "Environment.h"
+#include "resources.h"
+// #define ASPNETCORE_EVENT_GENERAL_ERROR                       1027 // L"Fatal Aspnet Core error"
+
 
 const PCWSTR HandlerResolver::s_pwzAspnetcoreInProcessRequestHandlerName = L"aspnetcorev2_inprocess.dll";
 const PCWSTR HandlerResolver::s_pwzAspnetcoreOutOfProcessRequestHandlerName = L"aspnetcorev2_outofprocess.dll";

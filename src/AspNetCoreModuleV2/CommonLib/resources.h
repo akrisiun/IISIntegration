@@ -47,3 +47,10 @@
 #define ASPNETCORE_EVENT_OUT_OF_PROCESS_RH_MISSING_MSG       L"Could not find the assembly '%s' for out-of-process application. Please confirm the assembly is installed correctly for IIS or IISExpress."
 #define ASPNETCORE_EVENT_INPROCESS_START_SUCCESS_MSG         L"Application '%s' started the coreclr in-process successfully."
 #define ASPNETCORE_EVENT_INPROCESS_START_ERROR_MSG           L"Application '%s' wasn't able to start. %s"
+
+// DWORD dwEventId
+// Messageid = 1028
+// https://github.com/aspnet/IISIntegration/blob/370490d2a36d46a6714e3b5321ad8139561f4000/src/AspNetCoreModuleV2/CommonLib/aspnetcore_msg.mc
+#define ASPNETCORE_EVENT_GENERAL_ERROR                       1027 // L"Fatal Aspnet Core error"
+#define ASPNETCORE_CONFIGURATION_LOAD_ERROR                  1034 // L"Fatal Aspnet Core configuration load error"
+#define ASPNETCORE_EVENT_GENERAL_WARNING                     1026
